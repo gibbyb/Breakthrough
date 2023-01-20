@@ -136,7 +136,7 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
         {
             running = false;
             g.setColor(Color.RED);
-            g.setFont(new Font("TimesRoman", Font.BOLD, 55));
+            g.setFont(new Font("TimesRoman", Font.BOLD, 50));
             FontMetrics metrics = getFontMetrics(g.getFont());
             int weiner = (curPlayer.Number % 2) + 1;
             String winner = "Player " + weiner + " Wins!";
