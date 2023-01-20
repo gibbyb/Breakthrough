@@ -36,13 +36,13 @@ public class Node
                     int offset = player.Number == 1 ? -1 : 1;
                     // Check for moving straight up
                     if (i + offset >= 0 && i + offset < board.Size && board.Array[i + offset][j] != player.Number && board.Array[i + offset][j] != (player.Number % 2) + 1)
-                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j, board), this));
+                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j, board, player), this));
                     // Check for up and to the right
                     if (i + offset >= 0 && i + offset < board.Size && j + 1 < 8 && board.Array[i + offset][j + 1] != player.Number)
-                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j + 1, board), this));
+                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j + 1, board, player), this));
                     // Check for up and to the left
                     if (i + offset >= 0 && i + offset < board.Size && j - 1 >= 0 && board.Array[i + offset][j - 1] != player.Number)
-                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j - 1, board), this));
+                        this.nextMoves.add(new Node(new Move(i, j, i + offset, j - 1, board, player), this));
                 }
             }
         }

@@ -32,8 +32,9 @@ public class Board
     // computer.
     public boolean makeMove(Move move)
     {
-        // Check if the move is valid according to the rules of Breakthrough
-        if (isValidMove(move))
+        // Computer already checks validity of move before adding to the arraylist
+        // so all computer moves are valid.
+        if (isValidMove(move) || !move.player.isHuman)
         {
             int target = this.Array[move.targetRow][move.targetColumn];
             if (target == 2) this.remainingP2Pieces--;
@@ -48,27 +49,27 @@ public class Board
         return false;
     }
 
+    // Check if the move is valid according to the rules of Breakthrough. I have literally never played the game so
+    // the rules could certainly be more nuanced and I will look into that one day.
     private boolean isValidMove(Move move)
     {
-        int currPlayer = this.Array[move.currentRow][move.currentCol];
-
         // Check if the target location is outside the board
         if (move.targetRow < 0 || move.targetRow >= this.Size || move.targetColumn < 0 || move.targetColumn >= this.Size)
             return false;
 
         // Check if the target location is occupied
-        if (this.Array[move.targetRow][move.targetColumn] == currPlayer)
+        if (this.Array[move.targetRow][move.targetColumn] == move.player.Number)
             return false;
 
         // Check if the piece belongs to the current player
-        if (this.Array[move.currentRow][move.currentCol] != currPlayer)
+        if (this.Array[move.currentRow][move.currentCol] != move.player.Number)
             return false;
 
         // Check if the piece is moving forward
-        if (currPlayer == 2 && move.targetRow <= move.currentRow)
+        if (move.player.Number == 2 && move.targetRow <= move.currentRow)
             return false;
 
-        if (currPlayer == 1 && move.targetRow >= move.currentRow)
+        if (move.player.Number == 1 && move.targetRow >= move.currentRow)
             return false;
 
         // Check if the piece is moving by one space only
@@ -78,7 +79,7 @@ public class Board
             return false;
 
         // Check if the piece is attacking diagonally
-        if (this.Array[move.targetRow][move.targetColumn] == currPlayer && columnDelta == 1)
+        if (this.Array[move.targetRow][move.targetColumn] == move.player.Number && columnDelta == 1)
             return false;
         else if (this.Array[move.targetRow][move.targetColumn] != 0 && columnDelta == 0)
             return false;
@@ -87,6 +88,7 @@ public class Board
         return true;
     }
 
+    // Boolean function that returns true when a player wins the game.
     public boolean winCondition()
     {
         /* Check for a normal win  */
@@ -117,7 +119,10 @@ public class Board
 
         return false;
     }
-
+}
+/*
+    // Function used early on for debugging,
+    // but I'd feel bad if I removed it.
     public void printArray()
     {
         System.out.println();
@@ -129,5 +134,4 @@ public class Board
         }
         System.out.println();
     }
-
-}
+ */

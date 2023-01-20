@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 int targetRow = (e.getY() - Border) / UnitSize;
                 int targetColumn = (e.getX() - Border) / UnitSize;
 
-                Move userMove = new Move(currentRow,currentCol,targetRow,targetColumn,board);
+                Move userMove = new Move(currentRow,currentCol,targetRow,targetColumn,board,curPlayer);
                 // This if statement is what literally moves the piece
                 if (board.makeMove(userMove))
                 {
@@ -126,8 +126,7 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 running = false;
             else if (!curPlayer.isHuman)
             {
-                curPlayer.newHeadNode();
-                curPlayer.headNode.checkMoves(curPlayer,board);
+                curPlayer.checkMoves(curPlayer,board);
                 curPlayer.headNode.offensiveHeuristic(curPlayer);
                 board.makeMove(curPlayer.headNode.bestNextMove.move);
                 // Update player's turn

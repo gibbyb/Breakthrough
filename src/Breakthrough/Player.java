@@ -13,6 +13,10 @@ public class Player
         this.isHuman = isHuman;
     }
 
-    public void newHeadNode() {this.headNode = new Node();}
+    public void checkMoves(Player player, Board board)
+    {
+        this.headNode = new Node();
+        this.headNode.checkMoves(player, board);
+    }
 
 }
