@@ -102,18 +102,3 @@ public class Board
         return false;
     }
 }
-/*
-    // Function used early on for debugging,
-    // but I'd feel bad if I removed it.
-    public void printArray()
-    {
-        System.out.println();
-        for (int i = 0; i < this.Size; i++)
-        {
-            for (int j = 0; j < this.Size; j++)
-                System.out.print(this.Array[i][j] + " ");
-            System.out.println();
-        }
-        System.out.println();
-    }
- */

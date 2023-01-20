@@ -80,6 +80,17 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
         }
     }
 
+    public void gameOver(Graphics g)
+    {
+            running = false;
+            g.setColor(Color.RED);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 50));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            int weiner = (curPlayer.Number % 2) + 1;
+            String winner = "Player " + weiner + " Wins!";
+            g.drawString(winner, (ScreenLength - metrics.stringWidth(winner))/2, ScreenLength/2);
+    }
+
     public void paintComponent(Graphics g)
     {
         g.setColor(new Color(93,67,44));
@@ -132,18 +143,8 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 }
             }
         }
-        if (board.winCondition())
-        {
-            running = false;
-            g.setColor(Color.RED);
-            g.setFont(new Font("TimesRoman", Font.BOLD, 50));
-            FontMetrics metrics = getFontMetrics(g.getFont());
-            int weiner = (curPlayer.Number % 2) + 1;
-            String winner = "Player " + weiner + " Wins!";
-            g.drawString(winner, (ScreenLength - metrics.stringWidth(winner))/2, ScreenLength/2);
-        }
-        else
-            computerMove();
+        if (board.winCondition()) gameOver(g);
+        else computerMove();
     }
 
     @Override
