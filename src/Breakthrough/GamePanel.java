@@ -124,10 +124,10 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 running = false;
             else if (!curPlayer.isHuman)
             {
-                curPlayer.headNode.checkMoves(curPlayer,board);
-                curPlayer.headNode.defensiveHeuristic(curPlayer);
-                board.makeMove(curPlayer.headNode.bestNextMove.move);
                 curPlayer.setHeadNode(board);
+                curPlayer.headNode.checkMoves(curPlayer,board);
+                curPlayer.headNode.offensiveHeuristic(curPlayer);
+                board.makeMove(curPlayer.headNode.bestNextMove.move);
                 // Update player's turn
                 curPlayer = (curPlayer == player1) ? player2 : player1;
                 repaint();
