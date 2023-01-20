@@ -6,13 +6,13 @@ public class Player
     public Node headNode;
     public boolean isHuman;
 
-    public Player(int Number, Board board, boolean isHuman)
+    public Player(int Number, boolean isHuman)
     {
         this.Number = Number;
-        this.headNode = new Node(board);
+        this.headNode = new Node();
         this.isHuman = isHuman;
     }
 
-    public void setHeadNode(Board board) {this.headNode = new Node(board);}
+    public void newHeadNode() {this.headNode = new Node();}
 
 }

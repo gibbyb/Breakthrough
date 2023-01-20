@@ -49,8 +49,10 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 // Check the target location and call the movePiece method to move the piece
                 int targetRow = (e.getY() - Border) / UnitSize;
                 int targetColumn = (e.getX() - Border) / UnitSize;
+
+                Move userMove = new Move(currentRow,currentCol,targetRow,targetColumn,board);
                 // This if statement is what literally moves the piece
-                if (board.movePiece(currentRow,currentCol,targetRow,targetColumn,curPlayer))
+                if (board.makeMove(userMove))
                 {
                     // Update player's turn
                     curPlayer = (curPlayer == player1) ? player2 : player1;
@@ -86,7 +88,7 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
             // right border
             g.fillRect((UnitSize*8) + Border,(int)(Border * 0.8), (int)(Border*0.2), (int)(UnitSize*8 + 2*(Border * 0.2)));
 
-            // This nested for loop is what prints our checker board as well as adds in the pieces.
+            // This nested for loop is what prints our checkerboard as well as adds in the pieces.
             for (int i = 0; i < board.Size; i++)
             {
                 for (int j = 0; j < board.Size; j++)
@@ -124,7 +126,7 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
                 running = false;
             else if (!curPlayer.isHuman)
             {
-                curPlayer.setHeadNode(board);
+                curPlayer.newHeadNode();
                 curPlayer.headNode.checkMoves(curPlayer,board);
                 curPlayer.headNode.offensiveHeuristic(curPlayer);
                 board.makeMove(curPlayer.headNode.bestNextMove.move);

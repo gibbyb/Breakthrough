@@ -10,7 +10,7 @@ public class Node
     public Move move;
 
     /* Constructor specifically for head node */
-    public Node(Board board)
+    public Node()
     {
         this.parent = null;
         this.move = null;
@@ -27,10 +27,6 @@ public class Node
 
     public void checkMoves(Player player, Board board)
     {
-        // Remove all moves if there are any.
-        if (!this.nextMoves.isEmpty())
-            for (int i = 0; i < this.nextMoves.size(); i++)
-                this.nextMoves.remove(i);
         for (int i = 0; i < board.Size; i++)
         {
             for (int j = 0; j < board.Size; j++)

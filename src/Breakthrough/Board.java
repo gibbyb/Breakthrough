@@ -1,5 +1,4 @@
 package Breakthrough;
-
 public class Board
 {
     public int[][] Array;
@@ -7,6 +6,8 @@ public class Board
     public int remainingP1Pieces;
     public int remainingP2Pieces;
 
+    // Board constructor. Only creates boards in new game
+    // state and with player 2 at top and player 1 at the bottom.
     public Board(int Size)
     {
         this.Size = Size;
@@ -27,65 +28,59 @@ public class Board
         }
     }
 
-    public boolean movePiece(int currentRow, int currentColumn, int targetRow, int targetColumn, Player curPlayer)
+    // Function to make moves used by both the user via the action listener and the
+    // computer.
+    public boolean makeMove(Move move)
     {
         // Check if the move is valid according to the rules of Breakthrough
-        if (isValidMove(currentRow, currentColumn, targetRow, targetColumn, curPlayer))
+        if (isValidMove(move))
         {
-            int target = this.Array[targetRow][targetColumn];
+            int target = this.Array[move.targetRow][move.targetColumn];
             if (target == 2) this.remainingP2Pieces--;
             if (target == 1) this.remainingP1Pieces--;
 
             // Update the board array to reflect the move
-            this.Array[targetRow][targetColumn] = this.Array[currentRow][currentColumn];
-            this.Array[currentRow][currentColumn] = 0;
+            this.Array[move.targetRow][move.targetColumn] = this.Array[move.currentRow][move.currentCol];
+            this.Array[move.currentRow][move.currentCol] = 0;
 
             return true;
         }
         return false;
     }
-    public void makeMove(Move move)
-    {
-        int target = this.Array[move.targetRow][move.targetColumn];
-        if (target == 2) this.remainingP2Pieces--;
-        if (target == 1) this.remainingP1Pieces--;
 
-        // Update the board array to reflect the move
-        this.Array[move.targetRow][move.targetColumn] = this.Array[move.currentRow][move.currentCol];
-        this.Array[move.currentRow][move.currentCol] = 0;
-    }
-
-    private boolean isValidMove(int currentRow, int currentColumn, int targetRow, int targetColumn, Player curPlayer)
+    private boolean isValidMove(Move move)
     {
+        int currPlayer = this.Array[move.currentRow][move.currentCol];
+
         // Check if the target location is outside the board
-        if (targetRow < 0 || targetRow >= this.Size || targetColumn < 0 || targetColumn >= this.Size)
+        if (move.targetRow < 0 || move.targetRow >= this.Size || move.targetColumn < 0 || move.targetColumn >= this.Size)
             return false;
 
         // Check if the target location is occupied
-        if (this.Array[targetRow][targetColumn] == curPlayer.Number)
+        if (this.Array[move.targetRow][move.targetColumn] == currPlayer)
             return false;
 
         // Check if the piece belongs to the current player
-        if (this.Array[currentRow][currentColumn] != curPlayer.Number)
+        if (this.Array[move.currentRow][move.currentCol] != currPlayer)
             return false;
 
         // Check if the piece is moving forward
-        if (curPlayer.Number == 2 && targetRow <= currentRow)
+        if (currPlayer == 2 && move.targetRow <= move.currentRow)
             return false;
 
-        if (curPlayer.Number == 1 && targetRow >= currentRow)
+        if (currPlayer == 1 && move.targetRow >= move.currentRow)
             return false;
 
         // Check if the piece is moving by one space only
-        int rowDelta = Math.abs(targetRow - currentRow);
-        int columnDelta = Math.abs(targetColumn - currentColumn);
+        int rowDelta = Math.abs(move.targetRow - move.currentRow);
+        int columnDelta = Math.abs(move.targetColumn - move.currentCol);
         if (rowDelta > 1 || columnDelta > 1)
             return false;
 
         // Check if the piece is attacking diagonally
-        if (this.Array[targetRow][targetColumn] == curPlayer.Number && columnDelta == 1)
+        if (this.Array[move.targetRow][move.targetColumn] == currPlayer && columnDelta == 1)
             return false;
-        else if (this.Array[targetRow][targetColumn] != 0 && columnDelta == 0)
+        else if (this.Array[move.targetRow][move.targetColumn] != 0 && columnDelta == 0)
             return false;
 
         // If none of the above conditions are met, the move is valid
@@ -104,7 +99,7 @@ public class Board
             }
             if (Array[this.Size-1][i] == 2)
             {
-                System.out.println("Player 1 wins!");
+                System.out.println("Player 2 wins!");
                 return true;
             }
         }
