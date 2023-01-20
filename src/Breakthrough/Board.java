@@ -93,29 +93,11 @@ public class Board
     {
         /* Check for a normal win  */
         for (int i = 0; i < this.Size; i++)
-        {
-            if (Array[0][i] == 1)
-            {
-                System.out.println("Player 1 wins!");
+            if (Array[0][i] == 1 || Array[this.Size-1][i] == 2)
                 return true;
-            }
-            if (Array[this.Size-1][i] == 2)
-            {
-                System.out.println("Player 2 wins!");
-                return true;
-            }
-        }
 
-        if (this.remainingP2Pieces == 0)
-        {
-            System.out.println("Player 1 wins!");
+        if (this.remainingP2Pieces == 0 || this.remainingP1Pieces == 0)
             return true;
-        }
-        if (this.remainingP1Pieces == 0)
-        {
-            System.out.println("Player 2 wins!");
-            return true;
-        }
 
         return false;
     }

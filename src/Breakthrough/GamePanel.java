@@ -67,73 +67,83 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
         running = true;
     }
 
+    public void computerMove()
+    {
+        if (!curPlayer.isHuman)
+        {
+            curPlayer.checkMoves(curPlayer,board);
+            curPlayer.headNode.offensiveHeuristic(curPlayer);
+            board.makeMove(curPlayer.headNode.bestNextMove.move);
+            // Update player's turn
+            curPlayer = (curPlayer == player1) ? player2 : player1;
+            repaint();
+        }
+    }
+
     public void paintComponent(Graphics g)
     {
-        // Literally all this code is just to create the chessboard and make it look pretty.
-        if (running)
+        g.setColor(new Color(93,67,44));
+        g.fillRect(0,0, ScreenLength, Border); // top border
+        g.fillRect(0,0,Border,ScreenLength); // left border
+        g.fillRect(0,(UnitSize*8) + Border,ScreenLength,Border + 10); // bottom border
+        g.fillRect((UnitSize*8) + Border,0,Border+10,ScreenLength); // right border
+
+        g.setColor(new Color(223,208,183));
+        // top border
+        g.fillRect((int)(Border * 0.8),(int)(Border * 0.8),(int)(UnitSize*8 + 2*(Border * 0.2)), (int)(Border*0.2));
+        //left border
+        g.fillRect((int)(Border * 0.8),(int)(Border * 0.8), (int)(Border*0.2),(int)(UnitSize*8 + 2*(Border * 0.2)));
+        // bottom border
+        g.fillRect((int)(Border * 0.8), (UnitSize*8) + Border, (int)(UnitSize*8 + 2*(Border * 0.2)), (int)(Border*0.2));
+        // right border
+        g.fillRect((UnitSize*8) + Border,(int)(Border * 0.8), (int)(Border*0.2), (int)(UnitSize*8 + 2*(Border * 0.2)));
+
+        // This nested for loop is what prints our checkerboard as well as adds in the pieces.
+        for (int i = 0; i < board.Size; i++)
         {
-            g.setColor(new Color(93,67,44));
-            g.fillRect(0,0, ScreenLength, Border); // top border
-            g.fillRect(0,0,Border,ScreenLength); // left border
-            g.fillRect(0,(UnitSize*8) + Border,ScreenLength,Border + 10); // bottom border
-            g.fillRect((UnitSize*8) + Border,0,Border+10,ScreenLength); // right border
-
-            g.setColor(new Color(223,208,183));
-            // top border
-            g.fillRect((int)(Border * 0.8),(int)(Border * 0.8),(int)(UnitSize*8 + 2*(Border * 0.2)), (int)(Border*0.2));
-            //left border
-            g.fillRect((int)(Border * 0.8),(int)(Border * 0.8), (int)(Border*0.2),(int)(UnitSize*8 + 2*(Border * 0.2)));
-            // bottom border
-            g.fillRect((int)(Border * 0.8), (UnitSize*8) + Border, (int)(UnitSize*8 + 2*(Border * 0.2)), (int)(Border*0.2));
-            // right border
-            g.fillRect((UnitSize*8) + Border,(int)(Border * 0.8), (int)(Border*0.2), (int)(UnitSize*8 + 2*(Border * 0.2)));
-
-            // This nested for loop is what prints our checkerboard as well as adds in the pieces.
-            for (int i = 0; i < board.Size; i++)
+            for (int j = 0; j < board.Size; j++)
             {
-                for (int j = 0; j < board.Size; j++)
+                if ((i + j) % 2 == 1)
                 {
-                    if ((i + j) % 2 == 1)
-                    {
-                        g.setColor(new Color(93,67,44));
-                        g.fillRect(j*UnitSize + Border, i *UnitSize + Border, UnitSize, UnitSize);
-                    }
-                    else if ((i + j) % 2 == 0)
-                    {
-                        g.setColor(new Color(223,208,183));
-                        g.fillRect(j*UnitSize + Border, i *UnitSize + Border, UnitSize, UnitSize);
-                    }
+                    g.setColor(new Color(93,67,44));
+                    g.fillRect(j*UnitSize + Border, i *UnitSize + Border, UnitSize, UnitSize);
+                }
+                else if ((i + j) % 2 == 0)
+                {
+                    g.setColor(new Color(223,208,183));
+                    g.fillRect(j*UnitSize + Border, i *UnitSize + Border, UnitSize, UnitSize);
+                }
 
-                    int diameter = (int)(UnitSize * 0.4);
-                    int x = j * UnitSize + Border + (UnitSize - diameter) / 2;
-                    int y = i * UnitSize + Border + (UnitSize - diameter) / 2;
+                int diameter = (int)(UnitSize * 0.4);
+                int x = j * UnitSize + Border + (UnitSize - diameter) / 2;
+                int y = i * UnitSize + Border + (UnitSize - diameter) / 2;
 
-                    if (this.board.Array[i][j] == 2)
-                    {
-                        // Draw a white piece at (x, y)
-                        g.setColor(Color.WHITE);
-                        g.fillOval(x, y, diameter, diameter);
-                    }
-                    else if (this.board.Array[i][j] == 1)
-                    {
-                        // Draw a black piece at (x, y)
-                        g.setColor(Color.BLACK);
-                        g.fillOval(x, y, diameter, diameter);
-                    }
+                if (this.board.Array[i][j] == 2)
+                {
+                    // Draw a white piece at (x, y)
+                    g.setColor(Color.WHITE);
+                    g.fillOval(x, y, diameter, diameter);
+                }
+                else if (this.board.Array[i][j] == 1)
+                {
+                    // Draw a black piece at (x, y)
+                    g.setColor(Color.BLACK);
+                    g.fillOval(x, y, diameter, diameter);
                 }
             }
-            if (board.winCondition())
-                running = false;
-            else if (!curPlayer.isHuman)
-            {
-                curPlayer.checkMoves(curPlayer,board);
-                curPlayer.headNode.offensiveHeuristic(curPlayer);
-                board.makeMove(curPlayer.headNode.bestNextMove.move);
-                // Update player's turn
-                curPlayer = (curPlayer == player1) ? player2 : player1;
-                repaint();
-            }
         }
+        if (board.winCondition())
+        {
+            running = false;
+            g.setColor(Color.RED);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 55));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            int weiner = (curPlayer.Number % 2) + 1;
+            String winner = "Player " + weiner + " Wins!";
+            g.drawString(winner, (ScreenLength - metrics.stringWidth(winner))/2, ScreenLength/2);
+        }
+        else
+            computerMove();
     }
 
     @Override
