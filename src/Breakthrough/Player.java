@@ -9,14 +9,14 @@ public class Player
     public Player(int Number, boolean isHuman)
     {
         this.Number = Number;
-        this.headNode = new Node();
+        this.headNode = new Node(this);
         this.isHuman = isHuman;
     }
 
-    public void checkMoves(Player player, Board board)
+    public void checkMoves(Board board)
     {
-        this.headNode = new Node();
-        this.headNode.checkMoves(player, board);
+        this.headNode = new Node(this);
+        this.headNode.checkMoves(board);
     }
 
 }

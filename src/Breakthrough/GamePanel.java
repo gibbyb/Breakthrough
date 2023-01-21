@@ -73,15 +73,56 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
     {
         if (!curPlayer.isHuman)
         {
-            curPlayer.checkMoves(curPlayer,board);
-            curPlayer.headNode.offensiveHeuristic(curPlayer);
-            if (curPlayer.Number == 2 && curPlayer.headNode.bestNextMove.move.remainingP1Pieces == board.remainingP1Pieces)
+            Random rand = new SecureRandom();
+            // Check for all available player moves. Note: One of the moves found here WILL be chosen.
+            curPlayer.checkMoves(board);
+            // First lets run an offensive heuristic on our available moves
+            // and find a move that takes the opponents piece if available.
+            curPlayer.headNode.offensiveHeuristic();
+
+            // if we are player 2 and our best move does not end with us taking any pieces, lets dig a bit deeper.
+            if (curPlayer.Number == 2 )//&& curPlayer.headNode.bestNextMove.move.remainingP1Pieces >= board.remainingP1Pieces)
             {
-                Random rand = new SecureRandom();
-                board.makeMove(curPlayer.headNode.nextMoves.get(rand.nextInt(curPlayer.headNode.nextMoves.size())).move);
+                // create a node holder for our opponents theoretical best move that they can make
+                Node bestMove = curPlayer.headNode.bestNextMove;
+                Node bestFoundMove = bestMove;
+
+                // for all our available moves,
+                for (Node P2Move1: curPlayer.headNode.nextMoves)
+                {
+                    Board P2Move1Board = new Board(board,P2Move1.move);
+                    // lets check all the opponents available moves.
+                    P2Move1.checkOpponentMoves(P2Move1Board);
+                    // run through offensive heuristic from opponents pov, meaning the
+                    // best move in each p2move1 should be one in which our opponent takes one of our pieces
+                    P2Move1.offensiveHeuristic();
+                    Board P1Move1Board = new Board(P2Move1Board,P2Move1.bestNextMove.move);
+
+                    // Check all available moves to you from opponents best move.
+                    Node predictedOpponentMove = P2Move1.bestNextMove;
+                    predictedOpponentMove.checkOpponentMoves(P1Move1Board);
+                    // Figure out your best move
+                    predictedOpponentMove.offensiveHeuristic();
+                    if (predictedOpponentMove.bestNextMove.move.remainingP1Pieces < bestFoundMove.move.remainingP1Pieces)
+                    {
+                        bestFoundMove = predictedOpponentMove.bestNextMove;
+                        bestMove = P2Move1;
+                    }
+                }
+                if (bestFoundMove.move.remainingP1Pieces == board.remainingP1Pieces)
+                    board.makeMove(curPlayer.headNode.nextMoves.get(rand.nextInt(curPlayer.headNode.nextMoves.size())).move);
+                else
+                    board.makeMove(bestMove.move);
+            }
+            else if (curPlayer.Number == 1 && curPlayer.headNode.bestNextMove.move.remainingP2Pieces == board.remainingP2Pieces)
+            {
+                curPlayer.headNode.defensiveHeuristic();
+                if (curPlayer.headNode.bestNextMove.move.remainingP2Pieces == board.remainingP2Pieces)
+                    board.makeMove(curPlayer.headNode.nextMoves.get(rand.nextInt(curPlayer.headNode.nextMoves.size())).move);
             }
             else
                 board.makeMove(curPlayer.headNode.bestNextMove.move);
+
             // Update player's turn
             curPlayer = (curPlayer == player1) ? player2 : player1;
             repaint();

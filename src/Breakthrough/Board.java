@@ -28,6 +28,28 @@ public class Board
         }
     }
 
+    // We need a new Board constructor for our AI. The idea is to pass
+    // a board and a move and create a board from that.
+    public Board(Board board, Move move)
+    {
+        this.Size = board.Size;
+        this.Array = new int[this.Size][this.Size];
+        this.remainingP1Pieces = move.remainingP1Pieces;
+        this.remainingP2Pieces = move.remainingP2Pieces;
+        for (int i = 0; i < this.Size; i++)
+        {
+            for (int j = 0; j < this.Size; j++)
+            {
+                if (i == move.currentRow && j == move.currentCol)
+                    this.Array[i][j] = 0;
+                else if (i == move.targetRow && j == move.targetColumn)
+                    this.Array[i][j] = move.player.Number;
+                else
+                    this.Array[i][j] = board.Array[i][j];
+            }
+        }
+    }
+
     // Function to make moves used by both the user via the action listener and the
     // computer.
     public boolean makeMove(Move move)
