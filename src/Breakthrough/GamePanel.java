@@ -3,6 +3,8 @@ package Breakthrough;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.security.SecureRandom;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, ComponentListener
 {
@@ -73,7 +75,13 @@ public class GamePanel extends JPanel implements ActionListener, ComponentListen
         {
             curPlayer.checkMoves(curPlayer,board);
             curPlayer.headNode.offensiveHeuristic(curPlayer);
-            board.makeMove(curPlayer.headNode.bestNextMove.move);
+            if (curPlayer.Number == 2 && curPlayer.headNode.bestNextMove.move.remainingP1Pieces == board.remainingP1Pieces)
+            {
+                Random rand = new SecureRandom();
+                board.makeMove(curPlayer.headNode.nextMoves.get(rand.nextInt(curPlayer.headNode.nextMoves.size())).move);
+            }
+            else
+                board.makeMove(curPlayer.headNode.bestNextMove.move);
             // Update player's turn
             curPlayer = (curPlayer == player1) ? player2 : player1;
             repaint();
