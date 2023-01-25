@@ -16,7 +16,6 @@ public class GameFrame extends JFrame
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setMinimumSize(new Dimension(400,440));
-        ImageIcon img = new ImageIcon("Icon/BreakthroughIcon256.png");
-        this.setIconImage(img.getImage());
+        this.setIconImage(new ImageIcon("resources/BreakthroughIcon256.png").getImage());
     }
 }
