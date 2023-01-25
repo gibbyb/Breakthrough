@@ -1,5 +1,7 @@
 package Breakthrough;
 
+import javafx.scene.image.Image;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -16,5 +18,7 @@ public class GameFrame extends JFrame
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setMinimumSize(new Dimension(400,440));
+        ImageIcon img = new ImageIcon("Icon/BreakthroughIcon256.png");
+        this.setIconImage(img.getImage());
     }
 }
