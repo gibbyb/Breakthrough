@@ -1,7 +1,5 @@
 package Breakthrough;
 
-import javafx.scene.image.Image;
-
 import javax.swing.*;
 import java.awt.*;
 
