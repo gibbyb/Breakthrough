@@ -1,71 +1,54 @@
 package Breakthrough;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Board
 {
-    public int[][] Array;
-    public int Size;
-    public int remainingP1Pieces;
-    public int remainingP2Pieces;
+    public int[][] array;
+    public int size;
+    public int p1 =1, p2 =2, curPlayer, p1Pieces, p2Pieces;
 
-    // Board constructor. Only creates boards in new game
-    // state and with player 2 at top and player 1 at the bottom.
-    public Board(int Size)
+    // Initial board constructor. Makes a fresh board & initializes variables.
+    public Board(int size)
     {
-        this.Size = Size;
-        this.Array = new int[this.Size][this.Size];
-        this.remainingP1Pieces = 2 * Size;
-        this.remainingP2Pieces = 2 * Size;
-        for (int i = 0; i < Size; i++)
-        {
-            for (int j = 0; j < Size; j++)
-            {
-                if (i < 2)
-                    this.Array[i][j] = 2;
-                else if (i > Size - 3)
-                    this.Array[i][j] = 1;
-                else
-                    this.Array[i][j] = 0;
-            }
-        }
+        this.size = size;
+        this.array = new int[size][size];
+        this.curPlayer = 1;
+        this.p1Pieces = size * 2;
+        this.p2Pieces = size * 2;
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                this.array[i][j] = (i < 2) ? 2 : ((i > size - 3) ? 1 : 0);
     }
 
-    // We need a new Board constructor for our AI. The idea is to pass
-    // a board and a move and create a board from that.
-    public Board(Board board, Move move)
+    // Copy constructor. Used to make a copy of the board for the AI to use.
+    public Board(Board parentBoard)
     {
-        this.Size = board.Size;
-        this.Array = new int[this.Size][this.Size];
-        this.remainingP1Pieces = move.remainingP1Pieces;
-        this.remainingP2Pieces = move.remainingP2Pieces;
-        for (int i = 0; i < this.Size; i++)
-        {
-            for (int j = 0; j < this.Size; j++)
-            {
-                if (i == move.currentRow && j == move.currentCol)
-                    this.Array[i][j] = 0;
-                else if (i == move.targetRow && j == move.targetColumn)
-                    this.Array[i][j] = move.player.Number;
-                else
-                    this.Array[i][j] = board.Array[i][j];
-            }
-        }
+        this.size = parentBoard.size;
+        this.array = new int[size][size];
+        this.curPlayer = parentBoard.curPlayer;
+        this.p1Pieces = parentBoard.p1Pieces;
+        this.p2Pieces = parentBoard.p2Pieces;
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                this.array[i][j] = parentBoard.array[i][j];
     }
 
     // Function to make moves used by both the user via the action listener and the
     // computer.
-    public boolean makeMove(Move move)
+    public boolean makeMove(int targetRow, int targetCol, int curRow, int curCol)
     {
-        // Computer already checks validity of move before adding to the arraylist
-        // so all computer moves are valid.
-        if (isValidMove(move) || !move.player.isHuman)
+        if (isValidMove(targetRow, targetCol, curRow, curCol))
         {
-            int target = this.Array[move.targetRow][move.targetColumn];
-            if (target == 2) this.remainingP2Pieces--;
-            if (target == 1) this.remainingP1Pieces--;
-
+            int target = this.array[targetRow][targetCol];
+            if (target == 2) this.p2Pieces--;
+            if (target == 1) this.p1Pieces--;
             // Update the board array to reflect the move
-            this.Array[move.targetRow][move.targetColumn] = this.Array[move.currentRow][move.currentCol];
-            this.Array[move.currentRow][move.currentCol] = 0;
-
+            this.array[targetRow][targetCol] = this.array[curRow][curCol];
+            this.array[curRow][curCol] = 0;
+            curPlayer = (curPlayer == p1) ? p2 : p1;
             return true;
         }
         return false;
@@ -73,54 +56,127 @@ public class Board
 
     // Check if the move is valid according to the rules of Breakthrough. I have literally never played the game so
     // the rules could certainly be more nuanced and I will look into that one day.
-    private boolean isValidMove(Move move)
+    public boolean isValidMove(int targetRow, int targetCol, int curRow, int curCol)
     {
         // Check if the target location is outside the board
-        if (move.targetRow < 0 || move.targetRow >= this.Size || move.targetColumn < 0 || move.targetColumn >= this.Size)
+        if (targetRow < 0 || targetRow >= this.size || targetCol < 0 || targetCol >= this.size)
             return false;
-
-        // Check if the target location is occupied
-        if (this.Array[move.targetRow][move.targetColumn] == move.player.Number)
+        // Check if piece belongs to current player & target location isn't occupied by current player
+        if (this.array[curRow][curCol] != curPlayer || this.array[targetRow][targetCol] == curPlayer)
             return false;
-
-        // Check if the piece belongs to the current player
-        if (this.Array[move.currentRow][move.currentCol] != move.player.Number)
+        // Make sure piece is moving forward
+        if ((curPlayer == 2 && targetRow <= curRow) || (curPlayer == 1 && targetRow >= curRow))
             return false;
-
-        // Check if the piece is moving forward
-        if (move.player.Number == 2 && move.targetRow <= move.currentRow)
-            return false;
-
-        if (move.player.Number == 1 && move.targetRow >= move.currentRow)
-            return false;
-
-        // Check if the piece is moving by one space only
-        int rowDelta = Math.abs(move.targetRow - move.currentRow);
-        int columnDelta = Math.abs(move.targetColumn - move.currentCol);
+        // Make sure piece is moving by one space only
+        int rowDelta = Math.abs(targetRow - curRow);
+        int columnDelta = Math.abs(targetCol - curCol);
         if (rowDelta > 1 || columnDelta > 1)
             return false;
-
-        // Check if the piece is attacking diagonally
-        if (this.Array[move.targetRow][move.targetColumn] == move.player.Number && columnDelta == 1)
+        // if target is not diagonal, make sure it is not occupied by anyone
+        else if (this.array[targetRow][targetCol] != 0 && columnDelta == 0)
             return false;
-        else if (this.Array[move.targetRow][move.targetColumn] != 0 && columnDelta == 0)
-            return false;
-
         // If none of the above conditions are met, the move is valid
         return true;
     }
 
+    public List<int[]> getPossibleMoves()
+    {
+        List<int[]> moves = new ArrayList<>();
+        for (int i = 0; i < this.size; i++)
+            for (int j = 0; j < this.size; j++)
+                if (this.array[i][j] == curPlayer)
+                    for (int dx = -1; dx <= 1; dx++)
+                        for (int dy = -1; dy <= 1; dy++)
+                            if (isValidMove(i + dy, j + dx, i, j))
+                                moves.add(new int[]{i + dy, j + dx, i, j});
+        return moves;
+    }
+
+    public int evaluate()
+    {
+        int offensiveHeuristic = p1Pieces - p2Pieces;
+        int defensiveHeuristic = p2Pieces - p1Pieces;
+        int distanceHeuristic = 0;
+        for (int i = 0; i < this.size; i++)
+        {
+            if (this.array[size - 1][i] == curPlayer)
+                distanceHeuristic += 10;
+            else if (this.array[size - 2][i] == curPlayer)
+                distanceHeuristic += 1;
+        }
+    return Math.max(offensiveHeuristic+distanceHeuristic, defensiveHeuristic+distanceHeuristic);
+    }
+
+    public int minimax(Board board, int depth, boolean maximizingPlayer)
+    {
+        if (depth == 0 || board.winCondition())
+            return board.evaluate();
+        if (maximizingPlayer)
+        {
+            int maxEval = Integer.MIN_VALUE;
+            List<int[]> moves = board.getPossibleMoves();
+            for (int[] move : moves)
+            {
+                Board childBoard = new Board(board);
+                for (int i = 0; i < board.size; i++)
+                    childBoard.array[i] = board.array[i].clone();
+                childBoard.makeMove(move[0], move[1], move[2], move[3]);
+                int eval = minimax(childBoard, depth - 1, false);
+                maxEval = Math.max(maxEval, eval);
+            }
+            return maxEval;
+        }
+        else
+        {
+            int minEval = Integer.MAX_VALUE;
+            List<int[]> moves = board.getPossibleMoves();
+            for (int[] move : moves)
+            {
+                Board childBoard = new Board(board);
+                childBoard.array = board.array.clone();
+                childBoard.makeMove(move[0], move[1], move[2], move[3]);
+                int eval = minimax(childBoard, depth - 1, true);
+                minEval = Math.min(minEval, eval);
+            }
+            return minEval;
+        }
+    }
+
+    public int[] bestMove(int depth)
+    {
+        int bestScore = Integer.MIN_VALUE;
+        List<int[]> bestMoves = new ArrayList<>();
+        List<int[]> moves = getPossibleMoves();
+        Random random = new Random();
+
+        for (int[] move: moves)
+        {
+            Board childBoard = new Board(this);
+            childBoard.makeMove(move[0], move[1], move[2], move[3]);
+            int score = minimax(childBoard, depth, false);
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestMoves.clear();
+                bestMoves.add(move);
+            }
+            else if (score == bestScore)
+                bestMoves.add(move);
+        }
+        if (!bestMoves.isEmpty())
+            return bestMoves.get(random.nextInt(bestMoves.size()));
+        return null;
+    }
+    
     // Boolean function that returns true when a player wins the game.
     public boolean winCondition()
     {
         /* Check for a normal win  */
-        for (int i = 0; i < this.Size; i++)
-            if (Array[0][i] == 1 || Array[this.Size-1][i] == 2)
+        for (int i = 0; i < this.size; i++)
+            if (array[0][i] == 1 || array[this.size-1][i] == 2)
                 return true;
-
-        if (this.remainingP2Pieces == 0 || this.remainingP1Pieces == 0)
+        if (this.p2Pieces == 0 || this.p1Pieces == 0)
             return true;
-
         return false;
     }
 }
